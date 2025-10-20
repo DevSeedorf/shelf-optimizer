@@ -47,7 +47,7 @@ The Shelf Optimizer is designed to solve the warehouse shelf allocation problem 
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/DevSeedorf/shelf-optimizer.git
    cd shelf
    ```
 
