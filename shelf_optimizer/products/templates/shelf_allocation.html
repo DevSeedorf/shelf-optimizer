@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shelf Allocation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            margin: 20px;
+        }
+        h2 {
+            color: #333;
+        }
+        .buttons {
+            margin-bottom: 20px;
+        }
+        .buttons a {
+            display: inline-block;
+            padding: 10px 20px;
+            text-decoration: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+            margin: 5px;
+        }
+        .buttons a:hover {
+            background-color: #0056b3;
+        }
+        table {
+            width: 80%;
+            margin: auto;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+        th {
+            background-color: #28a745;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        .penalty-details {
+            max-width: 800px;
+            margin: 30px auto;
+            text-align: left;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <h2>Shelf Space Allocation</h2>
+    <h4>Optimized Shelf Allocation (84 Products)</h4>
+    
+    <div class="buttons">
+        <a href="{% url 'optimize_shelves' %}?method=harmony">Run Harmony Search</a>
+        <a href="{% url 'optimize_shelves' %}?method=tabu">Run Tabu Search</a>
+    </div>
+
+    <table>
+        <tr>
+            <th>Product</th>
+            <th>Shelf</th>
+            <th>Column</th>
+            <th>Demand Level</th>
+        </tr>
+        {% for allocation in allocations %}
+        <tr>
+            <td>{{ allocation.product.name }}</td>
+            <td>{{ allocation.shelf }}</td>
+            <td>{{ allocation.column }}</td>
+            <td>
+                {% if allocation.product.demand_percent > 90 %}
+                    High 🔥
+                {% elif allocation.product.demand_percent >= 60 %}
+                    Average ⚖️
+                {% else %}
+                    Low 🐢
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <div class="penalty-details">
+        <h3>
+            🧮 Shelf Optimization Score: 
+            <span style="font-weight: bold;
+                {% if fitness_score == 0 %}
+                    color: green;
+                {% elif fitness_score <= 15 %}
+                    color: #28a745;
+                {% elif fitness_score <= 30 %}
+                    color: #ffc107;
+                {% else %}
+                    color: #dc3545;
+                {% endif %}">
+                {{ fitness_score|floatformat:2 }}
+            </span>
+            –
+            {% if fitness_score == 0 %}
+                Perfect 🏆
+            {% elif fitness_score <= 15 %}
+                Excellent 👍
+            {% elif fitness_score <= 30 %}
+                Good ⚠️
+            {% else %}
+                Needs Improvement ❌
+            {% endif %}
+        </h3>
+        
+        <h4 style="margin-bottom: 10px; margin-top: 20px;">📋 Shelf Violations:</h4>
+        <ul style="list-style: none; padding-left: 0;">
+            {% for line in penalty_log %}
+                <li style="margin-bottom: 8px; padding: 8px; background: #f8f9fa; border-radius: 4px;">
+                    {% if '+7' in line %}
+                        <span style="color: #dc3545; font-weight: bold;">🔴 {{ line }}</span>
+                    {% elif '+5' in line %}
+                        <span style="color: #fd7e14; font-weight: bold;">🟠 {{ line }}</span>
+                    {% else %}
+                        <span style="color: #6c757d;">{{ line }}</span>
+                    {% endif %}
+                </li>
+            {% empty %}
+                <li style="color: #28a745; font-weight: bold; padding: 8px; background: #e8f5e9;">
+                    ✅ Perfect shelf allocation - no violations 🎉
+                </li>
+            {% endfor %}
+        </ul>
+        
+    </div>
+
+    <div class="buttons">
+        <a href="{% url 'product_list' %}">Back to Product List</a>
+        <a href="{% url 'optimization_history' %}">View Optimization History</a>
+    </div>
+</body>
+</html>

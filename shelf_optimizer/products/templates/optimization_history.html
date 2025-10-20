@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Optimization History</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            margin: 30px;
+            text-align: center;
+        }
+        table {
+            width: 90%;
+            margin: auto;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 0 8px rgba(0,0,0,0.1);
+        }
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        .log {
+            text-align: left;
+            max-height: 150px;
+            overflow-y: auto;
+            padding: 10px;
+            background: #fff9f3;
+            border-left: 4px solid #fd7e14;
+            margin-top: 10px;
+            display: none;
+        }
+        .show-log {
+            background: #28a745;
+            color: white;
+            padding: 6px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .show-log:hover {
+            background: #218838;
+        }
+    </style>
+    <script>
+        function toggleLog(id) {
+            const el = document.getElementById("log-" + id);
+            el.style.display = el.style.display === "block" ? "none" : "block";
+        }
+    </script>
+</head>
+<body>
+    <h2>📈 Optimization History</h2>
+    <table>
+        <tr>
+            <th>Processed At</th>
+            <th>Method</th>
+            <th>Fitness</th>
+            <th>Time Taken</th>
+            <th>Actions</th>
+        </tr>
+        {% for result in results %}
+        <tr>
+            <td>
+                <div style="font-weight: bold; color: #007bff;">
+                    {{ result.created_at|date:"Y-m-d" }}
+                </div>
+                <div style="font-size: 0.9em; color: #666;">
+                    {{ result.created_at|time:"H:i:s" }}
+                </div>
+            </td>
+            <td>{{ result.get_method_display }}</td>
+            <td>{{ result.fitness_score }}</td>
+            <td>{{ result.time_taken }}s</td>
+            <td>
+                <button class="show-log" onclick="toggleLog({{ result.id }})">Toggle Log</button>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="4">
+                <div id="log-{{ result.id }}" class="log">
+                    <pre>{{ result.penalty_log }}</pre>
+                </div>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4">No optimization history yet.</td></tr>
+        {% endfor %}
+    </table>
+
+    <div style="margin-top: 20px;">
+        <a href="{% url 'product_list' %}" style="text-decoration:none; padding:10px 20px; background:#007bff; color:white; border-radius:5px; margin-right: 6px;">⬅ Back to Products
+        </a>
+
+        <a href="{% url 'clear_optimization_history' %}"
+       onclick="return confirm('Are you sure you want to clear all history?');"
+       style="text-decoration:none; background-color:#dc3545; color:white; padding:10px 20px; border-radius:5px;">
+        🗑️ Clear All History
+    </a>
+    </div>
+    
+</body>
+</html>
